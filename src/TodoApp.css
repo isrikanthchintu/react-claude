@@ -7,21 +7,23 @@
   justify-content: center;
   padding: 72px 16px 48px;
   box-sizing: border-box;
+  background: #FFFFFF;
 }
 
 .todo-card {
   width: 100%;
   max-width: 460px;
+  background: #FFFFFF;
 }
 
 /* ── Title ── */
 .todo-title {
   font-family: 'Syne', system-ui, sans-serif;
-  font-size: 56px;
+  font-size: 52px;
   font-weight: 800;
-  color: #e8eaf0;
+  color: #1a1a1a;
   letter-spacing: -0.04em;
-  line-height: 1;
+  line-height: 1.1;
   margin: 0 0 40px;
 }
 
@@ -38,19 +40,19 @@
 
 .task-input {
   flex: 1;
-  background: #252837;
-  border: 1.5px solid #363a52;
+  background: #FFFFFF;
+  border: 1.5px solid #e0e0e0;
   border-radius: 10px;
-  padding: 13px 16px;
+  padding: 14px 16px;
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 15px;
-  color: #e8eaf0;
+  font-size: 16px;
+  color: #1a1a1a;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .task-input::placeholder {
-  color: #3e4460;
+  color: #999999;
 }
 
 .task-input:focus {
@@ -83,8 +85,8 @@
 /* ── Empty state ── */
 .empty-state {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 14px;
-  color: #3e4460;
+  font-size: 15px;
+  color: #666666;
   text-align: center;
   padding: 48px 0 32px;
   margin: 0;
@@ -105,8 +107,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #252837;
-  border: 1.5px solid #363a52;
+  background: #FFFFFF;
+  border: 1.5px solid #e8e8e8;
   border-radius: 10px;
   padding: 14px 14px 14px 16px;
   animation: task-in 0.22s ease both;
@@ -149,7 +151,7 @@
 }
 
 .task-item.done {
-  border-color: #2a2e40;
+  border-color: #f0f0f0;
 }
 
 /* ── Circle toggle ── */
@@ -158,7 +160,7 @@
   height: 20px;
   flex-shrink: 0;
   border-radius: 50%;
-  border: 2px solid #363a52;
+  border: 2px solid #d0d0d0;
   background: transparent;
   cursor: pointer;
   position: relative;
@@ -191,25 +193,25 @@
 .task-text {
   flex: 1;
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 15px;
-  color: #c8cad6;
-  line-height: 1.4;
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.5;
   transition: color 0.2s, text-decoration-color 0.2s;
 }
 
 .task-item.done .task-text {
   text-decoration: line-through;
-  text-decoration-color: #3e4460;
-  color: #4a5070;
+  text-decoration-color: #cccccc;
+  color: #999999;
 }
 
 /* ── Remove button ── */
 .task-remove {
   background: none;
   border: none;
-  color: #363a52;
+  color: #cccccc;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   padding: 4px 6px;
   border-radius: 5px;
   flex-shrink: 0;
@@ -230,21 +232,21 @@
   justify-content: space-between;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #252837;
+  border-top: 1px solid #f0f0f0;
 }
 
 .task-count {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 13px;
-  color: #4a5070;
+  font-size: 14px;
+  color: #888888;
 }
 
 .clear-btn {
   background: none;
   border: none;
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 13px;
-  color: #4a5070;
+  font-size: 14px;
+  color: #888888;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 5px;
@@ -273,8 +275,16 @@
   }
 
   .todo-title {
-    font-size: 44px;
+    font-size: 40px;
     margin-bottom: 28px;
+  }
+
+  .task-input {
+    font-size: 15px;
+  }
+
+  .task-text {
+    font-size: 15px;
   }
 }
 
@@ -282,19 +292,19 @@
 .todo-roastery-link {
   margin-top: 36px;
   padding-top: 20px;
-  border-top: 1px solid #1a1e30;
+  border-top: 1px solid #f0f0f0;
   text-align: center;
 }
 
 .todo-roastery-sep {
-  font-size: 12px;
-  color: #252837;
+  font-size: 13px;
+  color: #e0e0e0;
 }
 
 .todo-roastery-anchor {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 12px;
-  color: #363a52;
+  font-size: 13px;
+  color: #666666;
   text-decoration: none;
   letter-spacing: 0.04em;
   transition: color 0.15s;
