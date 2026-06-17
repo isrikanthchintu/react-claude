@@ -20,8 +20,8 @@
 }
 
 .cr-nav-link {
-  font-size: 13px;
-  color: #5a6a4a;
+  font-size: 14px;
+  color: #7a9a6a;
   text-decoration: none;
   transition: color 0.15s;
 }
@@ -96,11 +96,11 @@
 
 /* ── Section label ── */
 .cr-section-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #4a5a3a;
+  color: #8a9a7a;
   margin: 0 0 32px;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .cr-bean-name { font-size: 19px; font-weight: 500; color: #f0ead8; line-height: 1.3; }
-.cr-bean-region { font-size: 12px; color: #3a4a2a; }
+.cr-bean-region { font-size: 13px; color: #6a8a5a; }
 
 .cr-note-chip {
   font-size: 12px;
@@ -145,8 +145,8 @@
   padding: 3px 8px;
 }
 
-.cr-data-item { font-family: 'DM Mono', monospace; font-size: 11px; color: #3a4a2a; }
-.cr-data-sep  { color: #2a3a1a; font-size: 11px; }
+.cr-data-item { font-family: 'DM Mono', monospace; font-size: 12px; color: #6a8a5a; }
+.cr-data-sep  { color: #4a6a3a; font-size: 12px; }
 
 /* ── Process ── */
 .cr-process {
@@ -170,20 +170,20 @@
   width: 14px;
 }
 
-.cr-step-title { font-size: 17px; font-weight: 500; color: #f0ead8; line-height: 1.3; }
-.cr-step-desc  { font-size: 14px; color: #5a6a4a; line-height: 1.7; }
+.cr-step-title { font-size: 18px; font-weight: 500; color: #f0ead8; line-height: 1.3; }
+.cr-step-desc  { font-size: 15px; color: #7a9a6a; line-height: 1.7; }
 
 /* ── Footer ── */
 .cr-footer { border-top: 1px solid rgba(184, 146, 74, 0.1); }
 
 .cr-footer-brand {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #3a4a2a;
+  color: #7a9a6a;
 }
-.cr-footer-copy { font-size: 12px; color: #2a3a1a; }
+.cr-footer-copy { font-size: 13px; color: #6a8a5a; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
