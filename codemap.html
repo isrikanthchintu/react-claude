@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Map — firstapp</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --panel: #161b22; --panel2: #1c2129;
+      --border: #30363d; --text: #e6edf3; --muted: #8b949e;
+      --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+    }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px;
+    }
+    header {
+      display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+      background: var(--panel); border-bottom: 1px solid var(--border);
+      flex-shrink: 0; height: 40px;
+    }
+    .hdr-title { font-size: 13px; font-weight: 600; }
+    .hdr-sub { font-size: 11px; color: var(--muted); font-family: ui-monospace, monospace; }
+    .hdr-badge {
+      font-size: 10px; padding: 1px 7px;
+      background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3);
+      border-radius: 10px; color: var(--accent);
+    }
+    .hdr-hint { margin-left: auto; font-size: 10px; color: var(--muted); }
+
+    .main-layout { display: flex; flex: 1; min-height: 0; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px; flex-shrink: 0; background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
+    }
+    .sb-sec { border-bottom: 1px solid var(--border); }
+    .sb-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 12px; cursor: pointer; user-select: none;
+    }
+    .sb-head:hover { background: var(--panel2); }
+    .sb-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+    .sb-arrow { font-size: 9px; color: var(--muted); transition: transform .2s; }
+    .sb-arrow.open { transform: rotate(90deg); }
+    .sb-body { padding: 4px 10px 10px; }
+    .sb-body.closed { display: none; }
+
+    .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .preset-btn {
+      padding: 5px 4px; background: var(--panel2); border: 1px solid var(--border);
+      border-radius: 4px; color: var(--muted); font-size: 10px; cursor: pointer; text-align: center;
+    }
+    .preset-btn:hover { border-color: #484f58; color: var(--text); }
+    .preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(88,166,255,.08); }
+
+    .toggle-row {
+      display: flex; align-items: center; gap: 7px; padding: 3px 0;
+      cursor: pointer; font-size: 11px; color: var(--muted); border-radius: 3px;
+    }
+    .toggle-row:hover { color: var(--text); }
+    .toggle-row input { width: 12px; height: 12px; cursor: pointer; accent-color: var(--accent); }
+    .t-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .tree { font-family: ui-monospace, monospace; font-size: 11px; }
+    .tree-node {
+      display: flex; align-items: center; gap: 4px; padding: 2px 4px;
+      border-radius: 3px; cursor: pointer; color: var(--muted); white-space: nowrap;
+    }
+    .tree-node:hover { background: var(--panel2); color: var(--text); }
+    .tree-node.lit { background: rgba(88,166,255,.12); color: var(--accent); }
+
+    .cmt-card {
+      background: var(--panel2); border: 1px solid var(--border);
+      border-radius: 5px; padding: 8px; margin-bottom: 5px;
+    }
+    .cmt-head { display: flex; justify-content: space-between; align-items: flex-start; gap:4px; margin-bottom: 4px; }
+    .cmt-target { font-size: 11px; font-weight: 600; color: var(--accent); }
+    .cmt-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+    .cmt-del:hover { color: var(--red); }
+    .cmt-body { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .no-cmt { font-size: 11px; color: var(--muted); font-style: italic; padding: 2px 0; }
+
+    /* Canvas */
+    .canvas-wrap {
+      flex: 1; position: relative; overflow: hidden; background: var(--bg);
+      background-image: radial-gradient(circle, #21262d 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+    #svg-main { width: 100%; height: 100%; cursor: grab; display: block; }
+    #svg-main.dragging { cursor: grabbing; }
+    .node-group { cursor: pointer; }
+    .node-group:hover .n-rect { filter: brightness(1.12) drop-shadow(0 0 5px rgba(88,166,255,.3)); }
+    .n-label { font-family: ui-monospace, monospace; font-size: 11.5px; font-weight: 600; pointer-events: none; }
+    .n-sub { font-family: ui-monospace, monospace; font-size: 9.5px; pointer-events: none; opacity: .6; }
+    .c-path { fill: none; stroke-width: 1.5; }
+    .c-lbl { font-family: ui-monospace, monospace; font-size: 9px; pointer-events: none; }
+
+    .zoom-bar {
+      position: absolute; bottom: 12px; right: 12px; display: flex; align-items: center;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    .z-btn { background: none; border: none; color: var(--text); padding: 5px 10px; cursor: pointer; font-size: 14px; line-height: 1; }
+    .z-btn:hover { background: var(--panel2); }
+    .z-pct { font-size: 10px; font-family: monospace; color: var(--muted); padding: 0 6px; min-width: 36px; text-align: center; }
+    .z-div { width: 1px; background: var(--border); height: 20px; }
+
+    .legend {
+      position: absolute; bottom: 12px; left: 12px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px;
+    }
+    .leg-row { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+    .leg-row:last-child { margin-bottom: 0; }
+    .leg-line { width: 22px; height: 2px; border-radius: 1px; }
+    .leg-dash { background: repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px); }
+
+    /* Prompt bar */
+    .prompt-bar {
+      border-top: 1px solid var(--border); background: var(--panel);
+      display: flex; align-items: flex-start; gap: 10px; padding: 8px 14px;
+      flex-shrink: 0; min-height: 54px; max-height: 100px;
+    }
+    .p-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding-top: 3px; white-space: nowrap; }
+    #prompt-out { flex: 1; font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--text); line-height: 1.5; white-space: pre-wrap; overflow-y: auto; }
+    .copy-btn { background: var(--panel2); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-size: 11px; padding: 4px 10px; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+    .copy-btn:hover { background: #30363d; }
+    .copy-btn.ok { border-color: var(--green); color: var(--green); }
+
+    /* Modal */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 200; }
+    .modal-bg.hidden { display: none; }
+    .modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 18px; width: 340px; }
+    .m-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .m-sub { font-size: 10px; color: var(--muted); font-family: monospace; margin-bottom: 12px; }
+    .m-ta { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-size: 12px; font-family: system-ui, sans-serif; padding: 8px; resize: none; height: 80px; outline: none; line-height: 1.4; }
+    .m-ta:focus { border-color: var(--accent); }
+    .m-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; }
+    .btn-pri { background: var(--accent); color: #0d1117; border: none; border-radius: 5px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-sec { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="hdr-title">Code Map</span>
+  <span class="hdr-sub">firstapp/</span>
+  <span class="hdr-badge">React · Vite · TypeScript</span>
+  <span class="hdr-hint">Drag to pan · Scroll to zoom · Click nodes to comment</span>
+</header>
+
+<div class="main-layout">
+  <div class="sidebar">
+
+    <div class="sb-sec">
+      <div class="sb-head" onclick="toggleSec(this)">
+        <span class="sb-title">Presets</span><span class="sb-arrow open">▶</span>
+      </div>
+      <div class="sb-body">
+        <div class="preset-grid">
+          <button class="preset-btn active" onclick="applyPreset('full',this)">Full System</button>
+          <button class="preset-btn" onclick="applyPreset('frontend',this)">Frontend</button>
+          <button class="preset-btn" onclick="applyPreset('flow',this)">Data Flow</button>
+          <button class="preset-btn" onclick="applyPreset('noext',this)">No External</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-head" onclick="toggleSec(this)">
+        <span class="sb-title">Layers</span><span class="sb-arrow open">▶</span>
+      </div>
+      <div class="sb-body" id="layer-toggles"></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-head" onclick="toggleSec(this)">
+        <span class="sb-title">Connections</span><span class="sb-arrow open">▶</span>
+      </div>
+      <div class="sb-body" id="conn-toggles"></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-head" onclick="toggleSec(this)">
+        <span class="sb-title">File Tree</span><span class="sb-arrow open">▶</span>
+      </div>
+      <div class="sb-body"><div class="tree" id="file-tree"></div></div>
+    </div>
+
+    <div class="sb-sec" style="flex:1">
+      <div class="sb-head" onclick="toggleSec(this)">
+        <span class="sb-title">Comments (<span id="cmt-count">0</span>)</span>
+        <span class="sb-arrow open">▶</span>
+      </div>
+      <div class="sb-body" id="cmt-list">
+        <div class="no-cmt">Click any node to add a comment.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="canvas-wrap" id="canvas-wrap">
+    <svg id="svg-main" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr-df" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#3b82f6"/>
+        </marker>
+        <marker id="arr-tc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#10b981"/>
+        </marker>
+        <marker id="arr-dp" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0,8 3,0 6" fill="#6b7280"/>
+        </marker>
+      </defs>
+      <g id="viewport"></g>
+    </svg>
+
+    <div class="zoom-bar">
+      <button class="z-btn" onclick="zoom(-0.15)">−</button>
+      <div class="z-div"></div>
+      <span class="z-pct" id="zoom-pct">100%</span>
+      <div class="z-div"></div>
+      <button class="z-btn" onclick="zoom(0.15)">+</button>
+      <div class="z-div"></div>
+      <button class="z-btn" onclick="centerView()" style="font-size:11px;padding:5px 8px" title="Fit to screen">↺</button>
+    </div>
+
+    <div class="legend">
+      <div class="leg-row"><div class="leg-line" style="background:#3b82f6"></div>Data Flow / Route</div>
+      <div class="leg-row"><div class="leg-line leg-dash" style="color:#10b981"></div>External Import</div>
+      <div class="leg-row"><div class="leg-line leg-dash" style="color:#6b7280"></div>Style Import</div>
+    </div>
+  </div>
+</div>
+
+<div class="prompt-bar">
+  <span class="p-label">Prompt</span>
+  <div id="prompt-out"></div>
+  <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
+</div>
+
+<div class="modal-bg hidden" id="modal-bg">
+  <div class="modal-box">
+    <div class="m-title" id="m-title">Node</div>
+    <div class="m-sub" id="m-sub">path</div>
+    <textarea class="m-ta" id="m-ta" placeholder="Add a note about this file… (⌘↵ to save)"></textarea>
+    <div class="m-actions">
+      <button class="btn-sec" onclick="closeModal()">Cancel</button>
+      <button class="btn-pri" onclick="saveComment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LAYERS = {
+  config:   { label:'Config / Build', dot:'#94a3b8', fill:'#e2e8f0', stroke:'#94a3b8', text:'#1e293b' },
+  entry:    { label:'Entry Point',    dot:'#3b82f6', fill:'#dbeafe', stroke:'#60a5fa', text:'#1e3a5f' },
+  app:      { label:'App / Router',   dot:'#f59e0b', fill:'#fef3c7', stroke:'#fbbf24', text:'#451a03' },
+  pages:    { label:'Pages',          dot:'#22c55e', fill:'#dcfce7', stroke:'#4ade80', text:'#14532d' },
+  styles:   { label:'Styles',         dot:'#ec4899', fill:'#fce7f3', stroke:'#f472b6', text:'#500724' },
+  external: { label:'External Deps',  dot:'#a855f7', fill:'#f3e8ff', stroke:'#c084fc', text:'#2e1065' },
+};
+
+const CONN_DEFS = {
+  'data-flow':  { label:'Data Flow / Route', color:'#3b82f6', dash:'0',   arrow:'arr-df' },
+  'tool-call':  { label:'External Import',   color:'#10b981', dash:'5 3', arrow:'arr-tc' },
+  'dependency': { label:'Style Import',      color:'#6b7280', dash:'3 3', arrow:'arr-dp' },
+};
+
+const NODES = [
+  { id:'index-html',  label:'index.html',          sub:'/',    x:40,  y:30,  w:130, h:44, layer:'config'   },
+  { id:'vite-config', label:'vite.config.ts',       sub:'/',    x:192, y:30,  w:150, h:44, layer:'config'   },
+  { id:'pkg-json',    label:'package.json',          sub:'/',    x:365, y:30,  w:130, h:44, layer:'config'   },
+  { id:'tsconfig',    label:'tsconfig.json',         sub:'/',    x:517, y:30,  w:132, h:44, layer:'config'   },
+  { id:'main-tsx',    label:'main.tsx',              sub:'src/', x:265, y:148, w:122, h:44, layer:'entry'    },
+  { id:'app-tsx',     label:'App.tsx',               sub:'src/', x:265, y:264, w:122, h:44, layer:'app'      },
+  { id:'todo-tsx',    label:'TodoApp.tsx',            sub:'src/', x:50,  y:380, w:150, h:44, layer:'pages'    },
+  { id:'coffee-tsx',  label:'CoffeeRoastery.tsx',    sub:'src/', x:232, y:380, w:178, h:44, layer:'pages'    },
+  { id:'brew-tsx',    label:'BrewGuide.tsx',          sub:'src/', x:434, y:380, w:140, h:44, layer:'pages'    },
+  { id:'index-css',   label:'index.css',             sub:'src/', x:40,  y:492, w:105, h:38, layer:'styles'   },
+  { id:'todo-css',    label:'TodoApp.css',            sub:'src/', x:162, y:492, w:118, h:38, layer:'styles'   },
+  { id:'coffee-css',  label:'CoffeeRoastery.css',    sub:'src/', x:297, y:492, w:162, h:38, layer:'styles'   },
+  { id:'brew-css',    label:'BrewGuide.css',          sub:'src/', x:476, y:492, w:122, h:38, layer:'styles'   },
+  { id:'react',       label:'react',                 sub:'pkg',  x:40,  y:592, w:82,  h:36, layer:'external' },
+  { id:'react-dom',   label:'react-dom',             sub:'pkg',  x:136, y:592, w:107, h:36, layer:'external' },
+  { id:'rrd',         label:'react-router-dom',      sub:'pkg',  x:258, y:592, w:162, h:36, layer:'external' },
+  { id:'vite-plugin', label:'@vitejs/plugin-react',  sub:'pkg',  x:436, y:592, w:178, h:36, layer:'external' },
+];
+
+const CONNS = [
+  { from:'index-html',  to:'main-tsx',    type:'data-flow',  label:'loads'   },
+  { from:'main-tsx',    to:'app-tsx',     type:'data-flow',  label:'renders' },
+  { from:'app-tsx',     to:'todo-tsx',    type:'data-flow',  label:'/'       },
+  { from:'app-tsx',     to:'coffee-tsx',  type:'data-flow',  label:'/coffee' },
+  { from:'app-tsx',     to:'brew-tsx',    type:'data-flow',  label:'/brew'   },
+  { from:'main-tsx',    to:'index-css',   type:'dependency', label:''        },
+  { from:'todo-tsx',    to:'todo-css',    type:'dependency', label:''        },
+  { from:'coffee-tsx',  to:'coffee-css',  type:'dependency', label:''        },
+  { from:'brew-tsx',    to:'brew-css',    type:'dependency', label:''        },
+  { from:'main-tsx',    to:'react',       type:'tool-call',  label:''        },
+  { from:'main-tsx',    to:'react-dom',   type:'tool-call',  label:''        },
+  { from:'app-tsx',     to:'rrd',         type:'tool-call',  label:''        },
+  { from:'todo-tsx',    to:'rrd',         type:'tool-call',  label:'Link'    },
+  { from:'coffee-tsx',  to:'rrd',         type:'tool-call',  label:'Link'    },
+  { from:'brew-tsx',    to:'rrd',         type:'tool-call',  label:'Link'    },
+  { from:'vite-config', to:'vite-plugin', type:'tool-call',  label:''        },
+];
+
+const FILE_TREE = [
+  { label:'firstapp/',          icon:'📁', depth:0, id:null          },
+  { label:'index.html',         icon:'🌐', depth:1, id:'index-html'  },
+  { label:'vite.config.ts',     icon:'⚙️', depth:1, id:'vite-config' },
+  { label:'package.json',       icon:'📦', depth:1, id:'pkg-json'    },
+  { label:'tsconfig.json',      icon:'📋', depth:1, id:'tsconfig'    },
+  { label:'src/',               icon:'📁', depth:1, id:null          },
+  { label:'main.tsx',           icon:'⚛️', depth:2, id:'main-tsx'    },
+  { label:'App.tsx',            icon:'⚛️', depth:2, id:'app-tsx'     },
+  { label:'index.css',          icon:'🎨', depth:2, id:'index-css'   },
+  { label:'TodoApp.tsx',        icon:'⚛️', depth:2, id:'todo-tsx'    },
+  { label:'TodoApp.css',        icon:'🎨', depth:2, id:'todo-css'    },
+  { label:'CoffeeRoastery.tsx', icon:'⚛️', depth:2, id:'coffee-tsx'  },
+  { label:'CoffeeRoastery.css', icon:'🎨', depth:2, id:'coffee-css'  },
+  { label:'BrewGuide.tsx',      icon:'⚛️', depth:2, id:'brew-tsx'    },
+  { label:'BrewGuide.css',      icon:'🎨', depth:2, id:'brew-css'    },
+  { label:'vite-env.d.ts',      icon:'📄', depth:2, id:null          },
+  { label:'public/',            icon:'📁', depth:1, id:null          },
+  { label:'vite.svg',           icon:'🖼️', depth:2, id:null          },
+];
+
+const state = {
+  layers: Object.fromEntries(Object.keys(LAYERS).map(k => [k, true])),
+  conns:  Object.fromEntries(Object.keys(CONN_DEFS).map(k => [k, true])),
+  comments: [],
+  highlighted: null,
+  tr: { x: 100, y: 30, s: 1 },
+};
+
+const PRESETS = {
+  full:     { layers:{config:1,entry:1,app:1,pages:1,styles:1,external:1}, conns:{'data-flow':1,'tool-call':1,'dependency':1} },
+  frontend: { layers:{config:0,entry:1,app:1,pages:1,styles:1,external:0}, conns:{'data-flow':1,'tool-call':0,'dependency':1} },
+  flow:     { layers:{config:1,entry:1,app:1,pages:1,styles:0,external:0}, conns:{'data-flow':1,'tool-call':0,'dependency':0} },
+  noext:    { layers:{config:1,entry:1,app:1,pages:1,styles:1,external:0}, conns:{'data-flow':1,'tool-call':0,'dependency':1} },
+};
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function initSidebar() {
+  const lt = document.getElementById('layer-toggles');
+  Object.entries(LAYERS).forEach(([key, lay]) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'toggle-row';
+    lbl.innerHTML = `<input type="checkbox" checked onchange="toggleLayer('${key}',this.checked)">
+      <span class="t-dot" style="background:${lay.dot}"></span><span>${lay.label}</span>`;
+    lt.appendChild(lbl);
+  });
+
+  const ct = document.getElementById('conn-toggles');
+  Object.entries(CONN_DEFS).forEach(([key, def]) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'toggle-row';
+    lbl.innerHTML = `<input type="checkbox" checked onchange="toggleConn('${key}',this.checked)">
+      <span class="t-dot" style="background:${def.color}"></span><span>${def.label}</span>`;
+    ct.appendChild(lbl);
+  });
+
+  const ft = document.getElementById('file-tree');
+  FILE_TREE.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'tree-node';
+    row.style.paddingLeft = `${4 + item.depth * 14}px`;
+    row.innerHTML = `<span style="font-size:10px">${item.icon}</span>${item.label}`;
+    if (item.id) {
+      row.dataset.id = item.id;
+      row.onclick = () => highlightNode(item.id);
+    }
+    ft.appendChild(row);
+  });
+}
+
+function toggleSec(head) {
+  head.nextElementSibling.classList.toggle('closed');
+  head.querySelector('.sb-arrow').classList.toggle('open');
+}
+
+function applyPreset(name, btn) {
+  const p = PRESETS[name];
+  if (!p) return;
+  Object.entries(p.layers).forEach(([k,v]) => state.layers[k] = !!v);
+  Object.entries(p.conns).forEach(([k,v]) => state.conns[k] = !!v);
+  document.querySelectorAll('#layer-toggles input').forEach((cb, i) => {
+    cb.checked = state.layers[Object.keys(LAYERS)[i]];
+  });
+  document.querySelectorAll('#conn-toggles input').forEach((cb, i) => {
+    cb.checked = state.conns[Object.keys(CONN_DEFS)[i]];
+  });
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  render();
+}
+
+function toggleLayer(key, val) {
+  state.layers[key] = val;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  render();
+}
+function toggleConn(key, val) {
+  state.conns[key] = val;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  render();
+}
+
+function highlightNode(id) {
+  state.highlighted = state.highlighted === id ? null : id;
+  document.querySelectorAll('.tree-node').forEach(el =>
+    el.classList.toggle('lit', el.dataset.id === id && state.highlighted === id)
+  );
+  if (state.highlighted) panToNode(id);
+  render();
+}
+
+function panToNode(id) {
+  const n = NODES.find(x => x.id === id);
+  if (!n) return;
+  const wrap = document.getElementById('canvas-wrap');
+  state.tr.x = wrap.clientWidth  / 2 - (n.x + n.w / 2) * state.tr.s;
+  state.tr.y = wrap.clientHeight / 2 - (n.y + n.h / 2) * state.tr.s;
+  applyTransform();
+}
+
+function render() {
+  const vp = document.getElementById('viewport');
+  vp.innerHTML = '';
+  const visNodes = NODES.filter(n => state.layers[n.layer]);
+  const visIds   = new Set(visNodes.map(n => n.id));
+  const visConns = CONNS.filter(c => state.conns[c.type] && visIds.has(c.from) && visIds.has(c.to));
+  const byId     = Object.fromEntries(NODES.map(n => [n.id, n]));
+
+  // connections
+  visConns.forEach(c => {
+    const def = CONN_DEFS[c.type];
+    const f = byId[c.from], t = byId[c.to];
+    const x1 = f.x + f.w/2, y1 = f.y + f.h;
+    const x2 = t.x + t.w/2, y2 = t.y;
+    const dy = Math.abs(y2 - y1) * 0.5;
+    const active = !state.highlighted || c.from === state.highlighted || c.to === state.highlighted;
+
+    vp.appendChild(svgEl('path', {
+      d: `M ${x1} ${y1} C ${x1} ${y1+dy} ${x2} ${y2-dy} ${x2} ${y2}`,
+      class: 'c-path', stroke: def.color,
+      'stroke-dasharray': def.dash, 'marker-end': `url(#${def.arrow})`,
+      opacity: active ? 1 : 0.1,
+    }));
+
+    if (c.label && active) {
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      vp.appendChild(svgEl('rect', { x:mx-18, y:my-8, width:36, height:13, fill:'#0d1117', rx:3 }));
+      const lbl = svgEl('text', { x:mx, y:my+2, 'text-anchor':'middle', class:'c-lbl', fill:def.color });
+      lbl.textContent = c.label;
+      vp.appendChild(lbl);
+    }
+  });
+
+  // nodes
+  visNodes.forEach(n => {
+    const lay = LAYERS[n.layer];
+    const hasCmt = state.comments.some(c => c.target === n.id);
+    const isLit  = state.highlighted === n.id;
+    const isDim  = state.highlighted && !isLit &&
+      !visConns.some(c => (c.from===state.highlighted&&c.to===n.id)||(c.to===state.highlighted&&c.from===n.id));
+
+    const g = svgEl('g', { class:'node-group', opacity: isDim ? '0.15' : '1' });
+
+    g.appendChild(svgEl('rect', {
+      x:n.x, y:n.y, width:n.w, height:n.h,
+      fill:lay.fill,
+      stroke: isLit||hasCmt ? '#58a6ff' : lay.stroke,
+      'stroke-width': isLit||hasCmt ? 2.5 : 1.5,
+      rx:6, class:'n-rect',
+    }));
+
+    const lbl = svgEl('text', { x:n.x+10, y:n.y+17, fill:lay.text, class:'n-label' });
+    lbl.textContent = n.label;
+    g.appendChild(lbl);
+
+    const sub = svgEl('text', { x:n.x+10, y:n.y+31, fill:lay.text, class:'n-sub' });
+    sub.textContent = n.sub;
+    g.appendChild(sub);
+
+    if (hasCmt) g.appendChild(svgEl('circle', { cx:n.x+n.w-8, cy:n.y+8, r:4, fill:'#58a6ff' }));
+
+    g.addEventListener('click', () => openModal(n.id));
+    vp.appendChild(g);
+  });
+
+  updatePrompt();
+}
+
+function updatePrompt() {
+  const hidden = Object.entries(state.layers).filter(([,v])=>!v).map(([k])=>LAYERS[k].label);
+  let out = 'Codebase: firstapp — React + Vite + TypeScript SPA with three routes (TodoApp, CoffeeRoastery, BrewGuide).';
+  if (hidden.length) out += `\nHidden layers: ${hidden.join(', ')}.`;
+  if (state.comments.length) {
+    out += '\n\nFeedback on specific files:';
+    state.comments.forEach(c => {
+      const n = NODES.find(x => x.id === c.target);
+      out += `\n\n**${c.targetLabel}** (${n ? n.sub+n.label : c.target}):\n${c.text}`;
+    });
+  } else {
+    out += '\n\nClick any node to annotate it, then copy this prompt to Claude.';
+  }
+  document.getElementById('prompt-out').textContent = out;
+}
+
+let modalTarget = null;
+
+function openModal(id) {
+  const n = NODES.find(x => x.id === id);
+  if (!n) return;
+  modalTarget = id;
+  document.getElementById('m-title').textContent = n.label;
+  document.getElementById('m-sub').textContent = n.sub + n.label;
+  document.getElementById('m-ta').value = (state.comments.find(c=>c.target===id)||{}).text || '';
+  document.getElementById('modal-bg').classList.remove('hidden');
+  document.getElementById('m-ta').focus();
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.add('hidden');
+  modalTarget = null;
+}
+function saveComment() {
+  const text = document.getElementById('m-ta').value.trim();
+  const n = NODES.find(x => x.id === modalTarget);
+  if (text) {
+    const idx = state.comments.findIndex(c => c.target === modalTarget);
+    const obj = { target:modalTarget, targetLabel:n.label, text };
+    idx >= 0 ? state.comments[idx] = obj : state.comments.push(obj);
+  } else {
+    state.comments = state.comments.filter(c => c.target !== modalTarget);
+  }
+  closeModal(); renderComments(); render();
+}
+function renderComments() {
+  document.getElementById('cmt-count').textContent = state.comments.length;
+  const list = document.getElementById('cmt-list');
+  if (!state.comments.length) {
+    list.innerHTML = '<div class="no-cmt">Click any node to add a comment.</div>';
+    return;
+  }
+  list.innerHTML = state.comments.map(c =>
+    `<div class="cmt-card">
+      <div class="cmt-head">
+        <span class="cmt-target">${c.targetLabel}</span>
+        <button class="cmt-del" onclick="deleteComment('${c.target}')">×</button>
+      </div>
+      <div class="cmt-body">${c.text.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+    </div>`
+  ).join('');
+}
+function deleteComment(id) {
+  state.comments = state.comments.filter(c => c.target !== id);
+  renderComments(); render();
+}
+
+function applyTransform() {
+  document.getElementById('viewport').setAttribute(
+    'transform', `translate(${state.tr.x},${state.tr.y}) scale(${state.tr.s})`
+  );
+  document.getElementById('zoom-pct').textContent = Math.round(state.tr.s * 100) + '%';
+}
+function zoom(delta, cx, cy) {
+  const wrap = document.getElementById('canvas-wrap');
+  cx = cx ?? wrap.clientWidth / 2; cy = cy ?? wrap.clientHeight / 2;
+  const newS = Math.max(0.15, Math.min(3, state.tr.s + delta));
+  const f = newS / state.tr.s;
+  state.tr.x = cx - (cx - state.tr.x) * f;
+  state.tr.y = cy - (cy - state.tr.y) * f;
+  state.tr.s = newS;
+  applyTransform();
+}
+function centerView() {
+  const wrap = document.getElementById('canvas-wrap');
+  const cw = 680, ch = 650;
+  state.tr.s = Math.min(1, wrap.clientWidth/cw*0.88, wrap.clientHeight/ch*0.88);
+  state.tr.x = (wrap.clientWidth  - cw * state.tr.s) / 2;
+  state.tr.y = (wrap.clientHeight - ch * state.tr.s) / 2;
+  applyTransform();
+}
+
+let pan = null;
+document.getElementById('svg-main').addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  pan = { mx:e.clientX, my:e.clientY, tx:state.tr.x, ty:state.tr.y };
+  e.currentTarget.classList.add('dragging');
+});
+window.addEventListener('mousemove', e => {
+  if (!pan) return;
+  state.tr.x = pan.tx + e.clientX - pan.mx;
+  state.tr.y = pan.ty + e.clientY - pan.my;
+  applyTransform();
+});
+window.addEventListener('mouseup', () => {
+  if (pan) { pan = null; document.getElementById('svg-main').classList.remove('dragging'); }
+});
+document.getElementById('svg-main').addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = document.getElementById('canvas-wrap').getBoundingClientRect();
+  zoom(e.deltaY < 0 ? 0.1 : -0.1, e.clientX-r.left, e.clientY-r.top);
+}, { passive:false });
+
+document.getElementById('m-ta').addEventListener('keydown', e => {
+  if (e.key==='Enter' && (e.metaKey||e.ctrlKey)) saveComment();
+  if (e.key==='Escape') closeModal();
+});
+document.getElementById('modal-bg').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeModal();
+});
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('prompt-out').textContent).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent='Copied!'; btn.classList.add('ok');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('ok'); }, 1500);
+  });
+}
+
+initSidebar();
+render();
+centerView();
+</script>
+</body>
+</html>

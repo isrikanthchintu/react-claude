@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=DM+Mono&family=DM+Sans:wght@400;500&display=swap');
+
+/* ── Page ── */
+.bg-page {
+  background: #181614;
+  min-height: 100vh;
+  color: #e2ceaa;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ── Nav ── */
+.bg-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
+  border-bottom: 1px solid rgba(196, 149, 74, 0.1);
+}
+
+.bg-brand {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e2ceaa;
+}
+
+.bg-nav-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.bg-nav-link {
+  font-size: 13px;
+  color: #5a5040;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.bg-nav-link:hover {
+  color: #c4954a;
+}
+
+/* ── Hero ── */
+.bg-hero {
+  padding: 80px 48px 96px;
+  border-bottom: 1px solid rgba(196, 149, 74, 0.08);
+}
+
+.bg-hero-inner {
+  max-width: 700px;
+}
+
+.bg-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #c4954a;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.bg-ratio {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(88px, 14vw, 140px);
+  font-weight: 700;
+  color: #f0e8d4;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  margin: 0 0 32px;
+}
+
+.bg-hero-sub {
+  font-size: 17px;
+  color: #6a5e4a;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 420px;
+}
+
+/* ── Section label ── */
+.bg-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #4a4030;
+  margin: 0 0 28px;
+}
+
+/* ── Methods ── */
+.bg-methods {
+  padding: 72px 48px;
+  background: #1c1a16;
+  border-bottom: 1px solid rgba(196, 149, 74, 0.08);
+}
+
+.bg-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.bg-method-card {
+  background: #211e1a;
+  border: 1px solid rgba(196, 149, 74, 0.1);
+  border-radius: 6px;
+  padding: 28px;
+  transition: border-color 0.18s;
+}
+
+.bg-method-card:hover {
+  border-color: rgba(196, 149, 74, 0.35);
+}
+
+.bg-method-name {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f0e8d4;
+  margin: 0 0 20px;
+  letter-spacing: -0.02em;
+}
+
+.bg-method-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(196, 149, 74, 0.08);
+}
+
+.bg-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bg-meta-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4a4030;
+}
+
+.bg-meta-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: #c4954a;
+}
+
+.bg-method-note {
+  font-size: 13px;
+  color: #5a5040;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Variables ── */
+.bg-variables {
+  padding: 72px 48px;
+}
+
+.bg-var-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 560px;
+}
+
+.bg-var-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 28px;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(196, 149, 74, 0.07);
+  align-items: start;
+}
+
+.bg-var-row:first-of-type {
+  padding-top: 0;
+}
+
+.bg-var-row:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.bg-var-name {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #e2ceaa;
+  margin: 0;
+  letter-spacing: -0.01em;
+  padding-top: 1px;
+}
+
+.bg-var-desc {
+  font-size: 14px;
+  color: #5a5040;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Footer ── */
+.bg-footer {
+  border-top: 1px solid rgba(196, 149, 74, 0.08);
+  padding: 28px 48px;
+}
+
+.bg-footer-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #3a3020;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .bg-nav { padding: 20px 24px; }
+
+  .bg-hero { padding: 56px 24px 72px; }
+
+  .bg-methods { padding: 56px 24px; }
+
+  .bg-method-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .bg-variables { padding: 56px 24px; }
+
+  .bg-var-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .bg-footer { padding: 24px; }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .bg-method-card,
+  .bg-nav-link { transition: none; }
+}

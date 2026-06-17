@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=DM+Mono&family=DM+Sans:wght@400;500&display=swap');
+
+/* ── Page ── */
+.cr-page {
+  background: #0f1a0f;
+  min-height: 100vh;
+  color: #f0ead8;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ── Nav ── */
+.cr-nav { border-bottom: 1px solid rgba(184, 146, 74, 0.12); }
+
+.cr-brand {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f0ead8;
+}
+
+.cr-nav-link {
+  font-size: 13px;
+  color: #5a6a4a;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.cr-nav-link:hover { color: #b8924a; }
+
+/* ── Hero ── */
+.cr-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 104px 48px 120px;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+}
+
+.cr-drum {
+  position: absolute;
+  right: -60px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 560px;
+  height: 560px;
+  opacity: 0.05;
+  animation: cr-spin 50s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cr-spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.cr-hero-content { position: relative; z-index: 1; max-width: 620px; }
+
+.cr-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(52px, 8vw, 92px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: #f0ead8;
+  margin: 0 0 28px;
+}
+
+.cr-brass { color: #b8924a; font-style: italic; }
+
+.cr-subline {
+  font-size: 17px;
+  color: #7a8a6a;
+  line-height: 1.7;
+  margin: 0 0 40px;
+}
+
+/* ── CTA Button (PrimeReact outlined override) ── */
+.cr-cta-btn.p-button {
+  background: transparent;
+  border: 1.5px solid #b8924a;
+  color: #b8924a;
+  border-radius: 3px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: background 0.18s, color 0.18s;
+}
+.cr-cta-btn.p-button:enabled:hover {
+  background: #b8924a;
+  color: #0f1a0f;
+  border-color: #b8924a;
+}
+.cr-cta-btn.p-button:focus { box-shadow: none; }
+
+/* ── Section label ── */
+.cr-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #4a5a3a;
+  margin: 0 0 32px;
+}
+
+/* ── Beans ── */
+.cr-beans {
+  padding: 80px 48px;
+  background: #111a11;
+  border-top: 1px solid rgba(184, 146, 74, 0.1);
+}
+
+/* PrimeReact Card override */
+.cr-bean-card.p-card {
+  background: #182018;
+  border: 1px solid rgba(184, 146, 74, 0.12);
+  border-radius: 6px;
+  color: #f0ead8;
+  box-shadow: none;
+  transition: border-color 0.2s;
+}
+.cr-bean-card.p-card:hover { border-color: rgba(184, 146, 74, 0.38); }
+.cr-bean-card .p-card-header { padding: 0; }
+.cr-bean-card .p-card-body  { padding: 0 24px 24px; }
+.cr-bean-card .p-card-content { padding: 0; }
+
+/* PrimeReact Tag override for roast level */
+.cr-roast-tag.p-tag {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.cr-bean-name { font-size: 19px; font-weight: 500; color: #f0ead8; line-height: 1.3; }
+.cr-bean-region { font-size: 12px; color: #3a4a2a; }
+
+.cr-note-chip {
+  font-size: 12px;
+  color: #8a7a5a;
+  background: rgba(184, 146, 74, 0.07);
+  border-radius: 3px;
+  padding: 3px 8px;
+}
+
+.cr-data-item { font-family: 'DM Mono', monospace; font-size: 11px; color: #3a4a2a; }
+.cr-data-sep  { color: #2a3a1a; font-size: 11px; }
+
+/* ── Process ── */
+.cr-process {
+  padding: 80px 48px;
+  border-top: 1px solid rgba(184, 146, 74, 0.1);
+}
+
+.cr-steps-list { max-width: 540px; }
+
+/* PrimeReact Divider override */
+.cr-step-divider.p-divider-horizontal::before {
+  border-top: 1px solid rgba(184, 146, 74, 0.07);
+}
+
+.cr-step-n {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #b8924a;
+  flex-shrink: 0;
+  padding-top: 2px;
+  width: 14px;
+}
+
+.cr-step-title { font-size: 17px; font-weight: 500; color: #f0ead8; line-height: 1.3; }
+.cr-step-desc  { font-size: 14px; color: #5a6a4a; line-height: 1.7; }
+
+/* ── Footer ── */
+.cr-footer { border-top: 1px solid rgba(184, 146, 74, 0.1); }
+
+.cr-footer-brand {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3a4a2a;
+}
+.cr-footer-copy { font-size: 12px; color: #2a3a1a; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .cr-hero { padding: 64px 24px 80px; min-height: auto; }
+  .cr-drum { display: none; }
+  .cr-beans  { padding: 56px 24px; }
+  .cr-process { padding: 56px 24px; }
+  .cr-footer { flex-direction: column; align-items: flex-start; gap: 6px; padding: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-drum { animation: none; }
+  .cr-cta-btn.p-button { transition: none; }
+}
